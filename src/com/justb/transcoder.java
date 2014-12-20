@@ -1,5 +1,7 @@
 package com.justb;
 
+import com.sun.java.swing.plaf.gtk.GTKLookAndFeel;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,17 +49,25 @@ public class transcoder extends JFrame {
             }
         });
 
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
+//        try {
+////            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//            UIManager.setLookAndFeel(new GTKLookAndFeel());
+////            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+////                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
+////                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+////                    break;
+////                }
+////            }
+////        } catch (ClassNotFoundException e) {
+////            e.printStackTrace();
+////        } catch (InstantiationException e) {
+////            e.printStackTrace();
+////        } catch (IllegalAccessException e) {
+////            e.printStackTrace();
+//        } catch (UnsupportedLookAndFeelException e) {
+//            e.printStackTrace();
+//            System.out.println("Unable to supply secified look and feel");
+//        }
 
         createMenu();
 
@@ -77,8 +87,8 @@ public class transcoder extends JFrame {
         StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < stringBuilder.length(); i++) {
-            if (stringBuilder.charAt(i) == ' ') {
-                result.append(' ');
+            if (immutableList1.get(stringBuilder.charAt(i)) == null) {
+                result.append(stringBuilder.charAt(i));
             } else {
                 result.append(immutableList.get(revisedAlphabet1.get(stringBuilder.charAt(i))));
             }
@@ -92,8 +102,8 @@ public class transcoder extends JFrame {
         StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < stringBuilder.length(); i++) {
-            if (stringBuilder.charAt(i) == ' ') {
-                result.append(' ');
+            if (immutableList1.get(stringBuilder.charAt(i)) == null) {
+                result.append(stringBuilder.charAt(i));
             } else {
                 result.append(revisedAlphabet.get(immutableList1.get(stringBuilder.charAt(i))));
             }
@@ -196,6 +206,7 @@ public class transcoder extends JFrame {
             public void actionPerformed(ActionEvent actionEvent) {
                 preferencesFrame.setFrameVisible(true);
                 System.out.println("Opening Preferences");
+                preferencesFrame.setKeyChar(keyCharacter);
             }
         });
 

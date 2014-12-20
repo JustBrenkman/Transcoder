@@ -49,4 +49,8 @@ public class Preferences extends JFrame {
     public void setFrameVisible(boolean b) {
         this.setVisible(b);
     }
+
+    public void setKeyChar(char keyChar) {
+        textField1.setText(String.valueOf(keyChar));
+    }
 }
