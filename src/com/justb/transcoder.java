@@ -3,6 +3,7 @@ package com.justb;
 import com.sun.java.swing.plaf.gtk.GTKLookAndFeel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
@@ -18,12 +19,14 @@ public class transcoder extends JFrame {
     private JButton decodeButton;
     private JButton encodeButton;
     private JPanel pane;
+    private JLabel encodedLabel;
+    private JLabel decodedLabel;
+    private JScrollPane jscrolldecode;
+    private JScrollPane jscrollencode;
 
     // Menu
-    private JMenuBar menuBar;
-    private JMenu file;
-    private JMenuItem preferences;
     private Preferences preferencesFrame;
+    private Process progress;
 
     private HashMap<Integer, Character> revisedAlphabet = new HashMap<Integer, Character>();
     private HashMap<Character, Integer> revisedAlphabet1 = new HashMap<Character, Integer>();
@@ -49,25 +52,32 @@ public class transcoder extends JFrame {
             }
         });
 
-//        try {
-////            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//            UIManager.setLookAndFeel(new GTKLookAndFeel());
-////            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-////                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
-////                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-////                    break;
-////                }
-////            }
-////        } catch (ClassNotFoundException e) {
-////            e.printStackTrace();
-////        } catch (InstantiationException e) {
-////            e.printStackTrace();
-////        } catch (IllegalAccessException e) {
-////            e.printStackTrace();
-//        } catch (UnsupportedLookAndFeelException e) {
-//            e.printStackTrace();
-//            System.out.println("Unable to supply secified look and feel");
-//        }
+        encodeButton.setBackground(new Color(60, 63, 65));
+        encodeButton.setForeground(new Color(187,187,187));
+
+        decodeButton.setBackground(new Color(60, 63, 65));
+        decodeButton.setForeground(new Color(187,187,187));
+
+        encodedText.setBackground(new Color(60, 63, 65));
+        encodedText.setForeground(new Color(187,187,187));
+
+        decodedText.setBackground(new Color(60, 63, 65));
+        decodedText.setForeground(new Color(187,187,187));
+
+        pane.setBackground(new Color(47, 50, 52));
+        pane.setForeground(new Color(187, 187, 187));
+
+        encodedLabel.setBackground(new Color(60, 63, 65));
+        encodedLabel.setForeground(new Color(187,187,187));
+
+        decodedLabel.setBackground(new Color(60, 63, 65));
+        decodedLabel.setForeground(new Color(187,187,187));
+
+        jscrolldecode.setBackground(new Color(60, 63, 65));
+        jscrolldecode.setForeground(new Color(187,187,187));
+
+        jscrollencode.setBackground(new Color(60, 63, 65));
+        jscrollencode.setForeground(new Color(187,187,187));
 
         createMenu();
 
@@ -80,21 +90,33 @@ public class transcoder extends JFrame {
         setUpLists(immutableList, revisedAlphabet, keyCharacter);
 
         preferencesFrame = new Preferences(this);
+        progress = new Process();
     }
 
     public void encode(JTextPane encode, JTextPane to) {
         StringBuilder stringBuilder = new StringBuilder(encode.getText());
         StringBuilder result = new StringBuilder();
 
+        progress.setValueOfProgress(0);
+        progress.setFrameVisible(true);
+
         for (int i = 0; i < stringBuilder.length(); i++) {
             if (immutableList1.get(stringBuilder.charAt(i)) == null) {
-                result.append(stringBuilder.charAt(i));
+                if (immutableList1.get( String.valueOf(stringBuilder.charAt(i)).toLowerCase().charAt(0)) != null) {
+                    result.append(immutableList.get(revisedAlphabet1.get(String.valueOf(stringBuilder.charAt(i)).toLowerCase().charAt(0))).toString().toUpperCase());
+                } else {
+                    result.append(stringBuilder.charAt(i));
+                }
             } else {
                 result.append(immutableList.get(revisedAlphabet1.get(stringBuilder.charAt(i))));
             }
+
+            progress.setValueOfProgress(result.length() / stringBuilder.length() * 100);
         }
 
         to.setText(result.toString());
+        progress.setFrameVisible(false);
+        progress.setValueOfProgress(0);
     }
 
     public void decode(JTextPane decode, JTextPane to) {
@@ -103,7 +125,11 @@ public class transcoder extends JFrame {
 
         for (int i = 0; i < stringBuilder.length(); i++) {
             if (immutableList1.get(stringBuilder.charAt(i)) == null) {
-                result.append(stringBuilder.charAt(i));
+                if (immutableList1.get(String.valueOf(stringBuilder.charAt(i)).toLowerCase().charAt(0)) != null) {
+                    result.append(revisedAlphabet.get(immutableList1.get(String.valueOf(stringBuilder.charAt(i)).toLowerCase().charAt(0))).toString().toUpperCase());
+                } else {
+                    result.append(stringBuilder.charAt(i));
+                }
             } else {
                 result.append(revisedAlphabet.get(immutableList1.get(stringBuilder.charAt(i))));
             }
@@ -197,6 +223,11 @@ public class transcoder extends JFrame {
     }
 
     private void createMenu() {
+
+        JMenuBar menuBar;
+        JMenu file;
+        JMenuItem preferences;
+
         menuBar = new JMenuBar();
         file = new JMenu("File");
         preferences = new JMenuItem("Preferences");
@@ -222,5 +253,29 @@ public class transcoder extends JFrame {
 
     public void updateLists() {
         setUpLists(immutableList, revisedAlphabet, keyCharacter);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+
+        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(new GTKLookAndFeel());
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+            System.out.println("Unable to supply secified look and feel");
+        }
     }
 }
