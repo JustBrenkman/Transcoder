@@ -1,8 +1,7 @@
 package com.justb;
 
-import com.sun.java.swing.plaf.gtk.GTKLookAndFeel;
-
 import javax.swing.*;
+import com.bulenkov.darcula.DarculaLaf;
 
 /**
  * Created by ben on 18/12/14.
@@ -15,7 +14,8 @@ public class Main {
 
         try {
 //            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            UIManager.setLookAndFeel(new GTKLookAndFeel());
+//            UIManager.setLookAndFeel(new GTKLookAndFeel());
+            UIManager.setLookAndFeel(new DarculaLaf());
 //            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
 //                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
 //                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
@@ -33,6 +33,6 @@ public class Main {
             System.out.println("Unable to supply secified look and feel");
         }
 
-        transcoder transcoder = new transcoder();
+        Transcoder transcoder = new Transcoder();
     }
 }

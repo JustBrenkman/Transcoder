@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="demo">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Documents/Programs/IdeaProjects/Darcula-master/lib/demo/AppFramework.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/Programs/IdeaProjects/Darcula-master/lib/demo/swing-worker.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/Programs/IdeaProjects/Darcula-master/lib/demo/TimingFramework.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/Programs/IdeaProjects/Darcula-master/lib/demo/swingx.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/Programs/IdeaProjects/Darcula-master/lib/demo/AnimatedTransitions.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -6,6 +6,9 @@
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/out/artifacts/final/META-INF/MANIFEST.MF" />
       </element>
+      <element id="module-output" name="Darcula-master" />
+      <element id="library" level="project" name="darcula" />
+      <element id="library" level="project" name="iconloader" />
     </root>
   </artifact>
 </component>

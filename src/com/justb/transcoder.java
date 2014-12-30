@@ -52,32 +52,32 @@ public class transcoder extends JFrame {
             }
         });
 
-        encodeButton.setBackground(new Color(60, 63, 65));
-        encodeButton.setForeground(new Color(187,187,187));
-
-        decodeButton.setBackground(new Color(60, 63, 65));
-        decodeButton.setForeground(new Color(187,187,187));
-
-        encodedText.setBackground(new Color(60, 63, 65));
-        encodedText.setForeground(new Color(187,187,187));
-
-        decodedText.setBackground(new Color(60, 63, 65));
-        decodedText.setForeground(new Color(187,187,187));
-
-        pane.setBackground(new Color(47, 50, 52));
-        pane.setForeground(new Color(187, 187, 187));
-
-        encodedLabel.setBackground(new Color(60, 63, 65));
-        encodedLabel.setForeground(new Color(187,187,187));
-
-        decodedLabel.setBackground(new Color(60, 63, 65));
-        decodedLabel.setForeground(new Color(187,187,187));
-
-        jscrolldecode.setBackground(new Color(60, 63, 65));
-        jscrolldecode.setForeground(new Color(187,187,187));
-
-        jscrollencode.setBackground(new Color(60, 63, 65));
-        jscrollencode.setForeground(new Color(187,187,187));
+//        encodeButton.setBackground(new Color(60, 63, 65));
+//        encodeButton.setForeground(new Color(187,187,187));
+//
+//        decodeButton.setBackground(new Color(60, 63, 65));
+//        decodeButton.setForeground(new Color(187,187,187));
+//
+//        encodedText.setBackground(new Color(60, 63, 65));
+//        encodedText.setForeground(new Color(187,187,187));
+//
+//        decodedText.setBackground(new Color(60, 63, 65));
+//        decodedText.setForeground(new Color(187,187,187));
+//
+//        pane.setBackground(new Color(47, 50, 52));
+//        pane.setForeground(new Color(187, 187, 187));
+//
+//        encodedLabel.setBackground(new Color(60, 63, 65));
+//        encodedLabel.setForeground(new Color(187,187,187));
+//
+//        decodedLabel.setBackground(new Color(60, 63, 65));
+//        decodedLabel.setForeground(new Color(187,187,187));
+//
+//        jscrolldecode.setBackground(new Color(60, 63, 65));
+//        jscrolldecode.setForeground(new Color(187,187,187));
+//
+//        jscrollencode.setBackground(new Color(60, 63, 65));
+//        jscrollencode.setForeground(new Color(187,187,187));
 
         createMenu();
 
@@ -115,13 +115,18 @@ public class transcoder extends JFrame {
         }
 
         to.setText(result.toString());
-        progress.setFrameVisible(false);
         progress.setValueOfProgress(0);
+        progress.setFrameVisible(false);
     }
 
     public void decode(JTextPane decode, JTextPane to) {
         StringBuilder stringBuilder = new StringBuilder(decode.getText());
         StringBuilder result = new StringBuilder();
+
+        progress.setValueOfProgress(50);
+        progress.setFrameVisible(true);
+
+        float p = 0;
 
         for (int i = 0; i < stringBuilder.length(); i++) {
             if (immutableList1.get(stringBuilder.charAt(i)) == null) {
@@ -133,8 +138,16 @@ public class transcoder extends JFrame {
             } else {
                 result.append(revisedAlphabet.get(immutableList1.get(stringBuilder.charAt(i))));
             }
+            progress.setValueOfProgress(result.length() / stringBuilder.length() * 100);
+
+            if (((result.length() / stringBuilder.length()) * 100) > p) {
+                p = ((result.length() / stringBuilder.length()) * 100);
+                System.out.println(p);
+            }
         }
 
+//        progress.setValueOfProgress(0);
+//        progress.setFrameVisible(false);
         to.setText(result.toString());
     }
 
@@ -277,5 +290,12 @@ public class transcoder extends JFrame {
             e.printStackTrace();
             System.out.println("Unable to supply secified look and feel");
         }
+    }
+
+
+    public void undateLookAndFeel() {
+//        UIManager.setLookAndFeel(lnfName);
+        SwingUtilities.updateComponentTreeUI(this);
+        this.pack();
     }
 }
