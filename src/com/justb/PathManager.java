@@ -31,8 +31,8 @@
 
 package com.justb;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -49,7 +49,7 @@ public class PathManager {
     private static PathManager instance;
     private static Path location;
     private static Path codeLocation;
-//    private static Logger logger;
+    private static Logger logger;
 
 
     /**
@@ -77,9 +77,9 @@ public class PathManager {
 //            System.out.println("installPath was null, running from IDE. Setting it to: " + installPath);
         }
 
-//        logger = LoggerFactory.getLogger(PathManager.class);
-//
-//        logger.info("Location: " + getLocationPath() + "/");
+        logger = LoggerFactory.getLogger(PathManager.class);
+
+        logger.info("Location: " + getLocationPath() + "/");
     }
 
     public static PathManager getInstance() {

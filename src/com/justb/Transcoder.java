@@ -1,11 +1,13 @@
 package com.justb;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
-import com.bulenkov.darcula.ui.*;
 
 /**
  * Created by ben on 29/12/14.
@@ -32,6 +34,8 @@ public class Transcoder extends JFrame {
 
     private Preferences preferencesFrame;
 
+    private PathManager pathManager;
+
     public Transcoder() {
         super("Transcoder");
 
@@ -50,6 +54,9 @@ public class Transcoder extends JFrame {
             }
         });
 
+        pathManager = PathManager.getInstance();
+        PathManager.initialize();
+
         createMenu();
 
         setContentPane(outterPanel);
@@ -62,7 +69,6 @@ public class Transcoder extends JFrame {
     }
 
     private void createMenu() {
-
         JMenuBar menuBar;
         JMenu file;
         JMenuItem preferences;
@@ -71,6 +77,14 @@ public class Transcoder extends JFrame {
         file = new JMenu("File");
         preferences = new JMenuItem("Preferences");
 
+        ImageIcon icon = new ImageIcon();
+        try {
+            icon = new ImageIcon(ImageIO.read(new File(PathManager.getLocationPath() + "/resources/images/preferences_16.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        preferences.setIcon(icon);
         preferences.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

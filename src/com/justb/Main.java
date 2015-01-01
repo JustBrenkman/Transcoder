@@ -1,6 +1,7 @@
 package com.justb;
 
 import javax.swing.*;
+
 import com.bulenkov.darcula.DarculaLaf;
 
 /**
@@ -12,27 +13,26 @@ public class Main {
 
     public static void main(String args[]) {
 
+        PathManager.getInstance();
+        PathManager.initialize();
+
         try {
-//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//            UIManager.setLookAndFeel(new GTKLookAndFeel());
             UIManager.setLookAndFeel(new DarculaLaf());
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("com.sun.java.swing.plaf.gtk.GTKLookAndFeel".equals(info.getClassName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
             System.out.println("Unable to supply secified look and feel");
         }
 
         Transcoder transcoder = new Transcoder();
+    }
+
+    public static void setUIFont (javax.swing.plaf.FontUIResource f){
+        java.util.Enumeration keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get (key);
+            if (value != null && value instanceof javax.swing.plaf.FontUIResource)
+                UIManager.put (key, f);
+        }
     }
 }

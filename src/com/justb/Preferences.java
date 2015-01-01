@@ -15,37 +15,7 @@ public class Preferences extends JFrame {
     private JTextField textField1;
     private JButton canelButton;
 
-    private transcoder transcoder;
     private Transcoder trans;
-
-    public Preferences(transcoder t) {
-        super("Preferences");
-
-        this.transcoder = t;
-
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (textField1.getText() != null) {
-                    transcoder.changeKeyCharacter(textField1.getText().charAt(0));
-                    transcoder.updateLists();
-                    setFrameVisible(false);
-                }
-            }
-        });
-
-        canelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                setFrameVisible(false);
-            }
-        });
-
-        setContentPane(panel);
-        pack();
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
 
     public Preferences(Transcoder t) {
         super("Preferences");
