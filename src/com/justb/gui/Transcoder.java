@@ -4,7 +4,9 @@ import com.justb.Coder;
 import com.justb.PathManager;
 import com.justb.eventbus.EventBusService;
 import com.justb.eventbus.EventHandler;
+import com.justb.messages.ConnectEvent;
 import com.justb.messages.EncodedMessage;
+import com.justb.messages.ServerStartEvent;
 import com.justb.server.Client;
 import com.justb.server.Server;
 
@@ -15,6 +17,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -39,9 +43,15 @@ public class Transcoder extends JFrame {
     private JList sent;
     private JList inbox;
     private DefaultListModel inboxList;
+    private DefaultListModel sendList;
     private JTextArea viewMessage;
     private JPanel inboxTab;
     private JPanel currentMessageTab;
+
+    private final JMenuItem connectToServer = new JMenuItem("Connect...");
+    private final JMenuItem disconnect = new JMenuItem("Disconnect");
+    private final JMenuItem startServer = new JMenuItem("Start Server");
+    private final JMenuItem stopServer = new JMenuItem("Stop Server");
 
     private HashMap<Integer, Character> revisedAlphabet = new HashMap<Integer, Character>();
     private HashMap<Character, Integer> revisedAlphabet1 = new HashMap<Character, Integer>();
@@ -51,6 +61,7 @@ public class Transcoder extends JFrame {
     private char keyCharacter = 'p';
 
     private Preferences preferencesFrame;
+    private Connect connectFrame;
 
     private PathManager pathManager;
 
@@ -87,6 +98,7 @@ public class Transcoder extends JFrame {
         setVisible(true);
 
         preferencesFrame = new Preferences(this);
+        connectFrame = new Connect();
 
         server = new Server();
 //        server.initializeServer(Server.ServerPriority.BACKGROUND);
@@ -103,17 +115,39 @@ public class Transcoder extends JFrame {
         });
 
         inboxList = new DefaultListModel();
+        sendList = new DefaultListModel();
 
         inbox.setModel(inboxList);
+        sent.setModel(sendList);
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (server.isRunning()) {
-                    server.sendObject(new EncodedMessage(keyCharacter, decodedText.getText()));
+                if (sentTab.getTitleAt(sentTab.getSelectedIndex()).equals("Message")) {
+                    if (server.isRunning()) {
+                        server.sendObject(new EncodedMessage(keyCharacter, viewMessage.getText()));
+                    }
+                    if (client.isRunning()) {
+                        client.sendObject(new EncodedMessage(keyCharacter, viewMessage.getText()));
+                    }
+                    sendList.addElement(viewMessage.getText().substring(0, viewMessage.getText().length() > 50 ? 50 : viewMessage.getText().length()));
+                } else {
+                    if (server.isRunning()) {
+                        server.sendObject(new EncodedMessage(keyCharacter, encondedText.getText()));
+                    }
+                    if (client.isRunning()) {
+                        client.sendObject(new EncodedMessage(keyCharacter, encondedText.getText()));
+                    }
+                    sendList.addElement(encondedText.getText().substring(0, encondedText.getText().length() > 50 ? 50 : encondedText.getText().length()));
                 }
-                if (client.isRunning()) {
-                    client.sendObject(new EncodedMessage(keyCharacter, decodedText.getText()));
-                }
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                server.shutDown();
+                client.shutDown();
             }
         });
     }
@@ -122,20 +156,13 @@ public class Transcoder extends JFrame {
         JMenuBar menuBar;
         JMenu file;
         JMenuItem preferences;
-        final JMenuItem startServer;
-        final JMenuItem stopServer;
-        final JMenuItem connectToServer;
-        final JMenuItem disconnect;
+
 
         menuBar = new JMenuBar();
         file = new JMenu("File");
 
         // Item Initialization
         preferences = new JMenuItem("Preferences");
-        startServer = new JMenuItem("Start Server");
-        stopServer = new JMenuItem("Stop Server");
-        connectToServer = new JMenuItem("Connect...");
-        disconnect = new JMenuItem("Disconnect");
 
         ImageIcon icon = new ImageIcon();
         try {
@@ -161,9 +188,7 @@ public class Transcoder extends JFrame {
         startServer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                server.initializeServer(Server.ServerPriority.BACKGROUND);
-                stopServer.setEnabled(true);
-                startServer.setEnabled(false);
+                ServerStart.main(new String[]{});
             }
         });
 
@@ -184,13 +209,8 @@ public class Transcoder extends JFrame {
         connectToServer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    client.connectToServer("127.0.0.1", 6789, Server.ServerPriority.BACKGROUND);
-                    disconnect.setEnabled(true);
-                    connectToServer.setEnabled(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                connectFrame.setVisible(true);
+                ConnectDialog.main(new String[]{});
             }
         });
 
@@ -231,5 +251,23 @@ public class Transcoder extends JFrame {
         System.out.println(e.message);
 //        inboxList.addElement("Hello");
         inboxList.addElement(e.message.substring(0, e.message.length() >= 50 ? 50 : e.message.length()));
+    }
+
+    @EventHandler
+    public void handleConnect(ConnectEvent event) {
+        try {
+            client.connectToServer(event.getIpAddress(), event.getPortNumber(), Server.ServerPriority.BACKGROUND);
+            disconnect.setEnabled(true);
+            connectToServer.setEnabled(false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @EventHandler
+    public void handleServerStart(ServerStartEvent serverStartEvent) {
+        server.initializeServer(serverStartEvent.getPort(), 100, Server.ServerPriority.BACKGROUND);
+        stopServer.setEnabled(true);
+        startServer.setEnabled(false);
     }
 }

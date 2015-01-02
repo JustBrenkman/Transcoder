@@ -32,10 +32,10 @@ public class Server extends Thread {
         HIGH, BACKGROUND
     }
 
-    public void initializeServer(ServerPriority serverPriority) {
+    public void initializeServer(int port, int amountOfPeople, ServerPriority serverPriority) {
         logger.info("Starting server...");
         try {
-            serverSocket = new ServerSocket(6789, 100); // Create a new Server at port 6789 only 100 connections for waiting
+            serverSocket = new ServerSocket(port, amountOfPeople); // Create a new Server at port 6789 only 100 connections for waiting
 
             switch (serverPriority) {
                 case HIGH:
