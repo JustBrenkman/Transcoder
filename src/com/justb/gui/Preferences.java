@@ -1,4 +1,4 @@
-package com.justb;
+package com.justb.gui;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

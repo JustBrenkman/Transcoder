@@ -3,6 +3,7 @@ package com.justb;
 import javax.swing.*;
 
 import com.bulenkov.darcula.DarculaLaf;
+import com.justb.gui.Transcoder;
 
 /**
  * Created by ben on 18/12/14.
