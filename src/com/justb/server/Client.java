@@ -74,6 +74,7 @@ public class Client extends Thread {
         logger.info("Shutting down client...");
         try {
             shutDownClient();
+            this.stop();
         } catch (IOException e) {
             e.printStackTrace();
         }

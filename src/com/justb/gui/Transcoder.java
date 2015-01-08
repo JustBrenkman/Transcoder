@@ -4,24 +4,24 @@ import com.justb.Coder;
 import com.justb.PathManager;
 import com.justb.eventbus.EventBusService;
 import com.justb.eventbus.EventHandler;
-import com.justb.messages.ConnectEvent;
-import com.justb.messages.EncodedMessage;
-import com.justb.messages.ServerStartEvent;
+import com.justb.messages.*;
+import com.justb.messages.internal.TakeImage;
 import com.justb.server.Client;
 import com.justb.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.lang.*;
+import java.util.*;
 
 /**
  * Created by ben on 29/12/14.
@@ -47,6 +47,14 @@ public class Transcoder extends JFrame {
     private JTextArea viewMessage;
     private JPanel inboxTab;
     private JPanel currentMessageTab;
+    private JToolBar toolBar;
+    private JButton openToolButton;
+    private JComboBox imageEffect;
+    private JTextField pictureFileName;
+    private JButton takePictureButton;
+    private JButton pictureButton;
+    private java.util.List<String> listOfInbox = new ArrayList<String>();
+    private java.util.List<String> listOfSent = new ArrayList<String>();
 
     private final JMenuItem connectToServer = new JMenuItem("Connect...");
     private final JMenuItem disconnect = new JMenuItem("Disconnect");
@@ -68,8 +76,14 @@ public class Transcoder extends JFrame {
     private Server server;
     private Client client;
 
+    private Logger logger;
+
+    private Transcoder instance;
+
     public Transcoder() {
         super("Transcoder");
+
+        instance = this;
 
         Coder.getInstance();
 
@@ -128,16 +142,20 @@ public class Transcoder extends JFrame {
                     }
                     if (client.isRunning()) {
                         client.sendObject(new EncodedMessage(keyCharacter, viewMessage.getText()));
+//                        client.sendObject(new SecretMessage(keyCharacter, decodedText.getText()));
                     }
                     sendList.addElement(viewMessage.getText().substring(0, viewMessage.getText().length() > 50 ? 50 : viewMessage.getText().length()));
+                    listOfSent.add(viewMessage.getText());
                 } else {
                     if (server.isRunning()) {
                         server.sendObject(new EncodedMessage(keyCharacter, encondedText.getText()));
                     }
                     if (client.isRunning()) {
                         client.sendObject(new EncodedMessage(keyCharacter, encondedText.getText()));
+//                        client.sendObject(new SecretMessage(keyCharacter, decodedText.getText()));
                     }
                     sendList.addElement(encondedText.getText().substring(0, encondedText.getText().length() > 50 ? 50 : encondedText.getText().length()));
+                    listOfSent.add(encondedText.getText());
                 }
             }
         });
@@ -150,13 +168,65 @@ public class Transcoder extends JFrame {
                 client.shutDown();
             }
         });
+
+
+        inbox.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+//                super.mouseClicked(e);
+                JList list = (JList) e.getSource();
+                if (e.getClickCount() == 2) {
+                    int index = list.locationToIndex(e.getPoint());
+//                    encondedText.setText((String) inboxList.getElementAt(index));
+                    encondedText.setText((String) listOfInbox.get(index));
+                } else if (e.getClickCount() == 3) {
+                    int index = list.locationToIndex(e.getPoint());
+                }
+            }
+        });
+        sent.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+//                super.mouseClicked(e);
+                JList list = (JList) e.getSource();
+                if (e.getClickCount() == 2) {
+                    int index = list.locationToIndex(e.getPoint());
+//                    encondedText.setText((String) sendList.getElementAt(index));
+                    encondedText.setText((String) listOfSent.get(index));
+                } else if (e.getClickCount() == 3) {
+                    int index = list.locationToIndex(e.getPoint());
+                }
+            }
+        });
+        openToolButton.setBorderPainted(false);
+
+        logger = LoggerFactory.getLogger(Transcoder.class);
+//        pictureButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                server.sendObject(new RuntimeMessage("raspistill -ifx cartoon -o still" + System.currentTimeMillis() + ".jpg"));
+//                System.out.println("Took a picture");
+//            }
+//        });
+        takePictureButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+//                server.sendObject(new ImageRequest(pictureFileName.getText(), (String) imageEffect.getSelectedItem()));
+//                System.out.println("Took a picture");
+                PictureRequest pic = new PictureRequest();
+                pic.start(instance);
+                if (instance == null) {
+                    System.out.println("NULL");
+                }
+            }
+        });
     }
 
     private void createMenu() {
         JMenuBar menuBar;
         JMenu file;
         JMenuItem preferences;
-
+        JMenuItem exit;
 
         menuBar = new JMenuBar();
         file = new JMenu("File");
@@ -175,9 +245,10 @@ public class Transcoder extends JFrame {
         preferences.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                preferencesFrame.setFrameVisible(true);
-                System.out.println("Opening Preferences");
+//                preferencesFrame.setFrameVisible(true);
+//                System.out.println("Opening Preferences");
                 preferencesFrame.setKeyChar(keyCharacter);
+                KeyCharacterDialog.main(new String[]{});
             }
         });
 
@@ -227,6 +298,14 @@ public class Transcoder extends JFrame {
 
         disconnect.setEnabled(false);
 
+        exit = new JMenuItem("Exit");
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                shutDown();
+            }
+        });
+
         menuBar.add(file);
         file.add(preferences);
         file.addSeparator();
@@ -234,6 +313,8 @@ public class Transcoder extends JFrame {
         file.add(stopServer);
         file.add(connectToServer);
         file.add(disconnect);
+        file.addSeparator();
+        file.add(exit);
 
         this.setJMenuBar(menuBar);
     }
@@ -250,7 +331,10 @@ public class Transcoder extends JFrame {
     public void handler(EncodedMessage e) {
         System.out.println(e.message);
 //        inboxList.addElement("Hello");
+        listOfInbox.add(e.message);
         inboxList.addElement(e.message.substring(0, e.message.length() >= 50 ? 50 : e.message.length()));
+        logger.info("Key Character: " + e.keyCharater);
+
     }
 
     @EventHandler
@@ -270,4 +354,91 @@ public class Transcoder extends JFrame {
         stopServer.setEnabled(true);
         startServer.setEnabled(false);
     }
+
+    @EventHandler
+    public void handleKeyCharacterChange(ChangeKeyCharacterEvent event) {
+        changeKeyCharacter(event.getKeyCharacter());
+        updateLists();
+    }
+
+    @EventHandler
+    public void handleRuntimeMessage(RuntimeMessage runtimeMessage) {
+        try {
+            Runtime.getRuntime().exec(runtimeMessage.getCommand());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @EventHandler
+    public void handleImageRequest(ImageRequest imageRequest) {
+        logger.info("Taking a picture: effect: " + imageRequest.getEffect().toLowerCase() + " Filename: " + imageRequest.getName());
+        java.lang.Process p = null;
+        try {
+            if (imageRequest.getEffect().toLowerCase().equals("none")) {
+                p = Runtime.getRuntime().exec("raspistill" + " -o " + PathManager.getLocationPath() + "/imageTransfer.jpg");
+            } else {
+                p = Runtime.getRuntime().exec("raspistill" + " -ifx " + imageRequest.getEffect().toLowerCase() + " -o "  + PathManager.getLocationPath() + "/imageTransfer.jpg");
+            }
+            p.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        BufferedImage bufferedImage = null;
+
+        try {
+            bufferedImage = ImageIO.read(new File(PathManager.getLocationPath() + "/imageTransfer.jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (getServer().isRunning()) {
+            getServer().sendObject(new ImageExchange(bufferedImage, imageRequest.getName()));
+        } else if (getClient().isRunning()) {
+            getClient().sendObject(new ImageExchange(bufferedImage, imageRequest.getName()));
+        }
+    }
+
+    public void shutDown() {
+        client.shutDown();
+        server.shutDown();
+        dispose();
+        System.exit(0);
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    @EventHandler
+    public void handleImageExchange(ImageExchange exchange) {
+        try {
+            File file = new File(PathManager.getLocationPath() + "/" + exchange.getName() + ".jpg");
+            ImageIO.write(exchange.getImage(), "jpg", file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @EventHandler
+    public void handleTakeImage(TakeImage image) {
+            if (getServer() != null) {
+                if (getServer().isRunning()) {
+                    getServer().sendObject(new ImageRequest(image.getName(), image.getEffect()));
+                }
+            }
+            if (getClient() != null) {
+                if (getClient().isRunning()) {
+                    getClient().sendObject(new ImageRequest(image.getName(), image.getEffect()));
+                }
+            }
+            System.out.println("Took a picture");
+        }
 }
